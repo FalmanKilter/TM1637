@@ -3,23 +3,6 @@
 
 /*========================================================================================================*/
 
-#define sig_pin         GPIO_PIN_1      /* define signal pin*/
-#define sig_port        GPIOA           /* and corresponding port*/
-
-#define clk_pin         GPIO_PIN_1      /* define clock pin*/
-#define clk_port        GPIOB           /* and corresponding port*/
-
-#define sig_high        HAL_GPIO_WritePin(sig_port, sig_pin, GPIO_PIN_SET)      /* set signal pin HIGH*/
-#define sig_low         HAL_GPIO_WritePin(sig_port, sig_pin, GPIO_PIN_RESET)    /* set signal pin LOW*/
-
-#define clk_high        HAL_GPIO_WritePin(clk_port, clk_pin, GPIO_PIN_SET)      /* set clock pin HIGH*/
-#define clk_low         HAL_GPIO_WritePin(clk_port, clk_pin, GPIO_PIN_RESET)    /* set clock pin LOW*/
-
-#define tic             5       /* clocking half period in microseconds*/
-
-#define disp_off        0x80    /* display off setting*/
-#define disp_on         0x88    /* display on setting, initial zero brightness*/
-
 #define write_to_fixed_addr      0x44    /* set write to fixed address command */   
 
 #define grid_1          0xC0    /* grid 1 address*/
@@ -32,19 +15,48 @@
 #define digit_num       4       /* 4-digit display connected to tm1637*/
 
 #define max_data        9999    /* maximum number 4-digit display can handle*/
+
+typedef struct 
+{
+  
+  GPIO_TypeDef*  sig_port;      /* signal port */
+  
+  GPIO_TypeDef*  clk_port;      /* clock port */
+  
+  uint16_t      sig_pin;        /* signal pin */
+  
+  uint16_t      clk_pin;        /* clock pin */
+    
+  uint16_t      tic;            /* clocking half-period*/
+  
+  uint8_t       brightness;     /* brightness setting */
+  
+  uint8_t       separator;      /* separator on/off */
+  
+} TM1637_display_type;
 /*========================================================================================================*/
 
-/*INITIALISATION FUNCTIONS */
-/* disp initial reset to 0 */
-void disp_init();
+/*INITIALISATION */
+/* display instance init*/
+void TM1637_init(TM1637_display_type display, TIM_HandleTypeDef tm);
 
-/* GPIO pins initialisation */
-void gpio_init(void);
+/* DATA OUTPUT TO DISPLAY*/
+/* display decimal number*/
+void TM1637_disp_d(uint16_t data);
 
-/* TIM start*/
-void tm_start(TIM_HandleTypeDef tm);
+/*========================================================================================================*/
 
 /* PRIVATE AUXILIARY FUNCTIONS */
+/* convert human pin number to bit field definition given in stm32f4xx_hal_gpio.h
+    to pass to GPIO init functions*/
+uint16_t get_gpio_pin(uint8_t num);
+
+/* pin control */
+void sig_high();
+void sig_low();
+void clk_high();
+void clk_low();
+
 /* refresh display - reset all grid segments*/
 void refresh_disp();
 
@@ -53,6 +65,12 @@ void delay(uint16_t dt);
 
 /* convert a digit into segment code g f e d c b a  style*/
 uint8_t digit_to_hex(uint8_t digit);
+
+/* display 'Err' */
+void disp_err();
+
+/* display separator between grid #2 and #3*/
+void disp_separator();
 
 /* INTERFACE COMMAND FUNCTIONS */
 /* start command sequence */
@@ -74,12 +92,6 @@ void await_ack();
 /* turns on the desired segments by the desired address*/
 void seg_on(uint8_t num, uint8_t addr);
 
-/* DATA OUTPUT TO DISPLAY*/
-/* display decimal number*/
-void disp_d(uint16_t data);
 
-/* display 'Err' */
-void disp_err();
 
-/* display separator between grid #2 and #3*/
-void disp_separator();
+
