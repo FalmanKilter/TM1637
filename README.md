@@ -16,9 +16,9 @@ EXAMPLE:
   
   my_display.tic = 5;
   
-  my_display.brightness = 0;
+  my_display.brightness = 7;
   
-  my_display.separator = 0;
+  my_display.separator = 1;
   
   TM1637_init(my_display, htim2); // htim2 is a preconfigured timer as in 'TIM_HandleTypeDef htim2;'
   
