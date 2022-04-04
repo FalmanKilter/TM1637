@@ -1,4 +1,4 @@
-# TM1637
+# TM1637 for STM32
 TM1637 library
 features functions to work with a TM1637 driver for LED display.
 tested on a 4-digit display, stm32f407g-disc1 board.
@@ -22,7 +22,7 @@ EXAMPLE:
   
   TM1637_init(my_display, htim2); // htim2 is a preconfigured timer as in 'TIM_HandleTypeDef htim2;'
   
-while()
+while(1)
 {
   TM1637_disp_d(1234);
 }
